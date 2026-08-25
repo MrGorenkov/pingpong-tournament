@@ -1,0 +1,95 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+  /*
+   * Pinned dark "scoreboard" base — chosen for sunlight readability and a
+   * consistent identity. Telegram theme variables (--tg-theme-*) are still
+   * bound by the SDK and can be inherited where desired; we keep the base dark
+   * and a single orange accent on purpose (see DECISIONS.md).
+   */
+  --bg: #0d1014;
+  --surface: #161b22;
+  --surface-2: #1e242d;
+  --hairline: #2a323d;
+  --text: #eef3f8;
+  --muted: #9aa7b4;
+  --faint: #5c6976;
+  --accent: #ff6a2b;
+  --accent-ink: #180b03;
+  --accent-flash: rgba(255, 106, 43, 0.18);
+  --win: #35d07f;
+  --lose: #ff5c68;
+  --gold: #ffcf3f;
+  --silver: #c7d0da;
+  --bronze: #e0894a;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Space Grotesk', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overscroll-behavior-y: none;
+}
+
+.tnum {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
+}
+
+.safe-top {
+  padding-top: max(env(safe-area-inset-top), 0.25rem);
+}
+.safe-bottom {
+  padding-bottom: max(env(safe-area-inset-bottom), 0.5rem);
+}
+
+@layer components {
+  .card {
+    @apply bg-surface rounded-2xl border border-hair;
+  }
+  .chip {
+    @apply inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold;
+  }
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-3 font-semibold transition active:scale-[0.98] disabled:opacity-40 disabled:pointer-events-none;
+  }
+  .btn-accent {
+    @apply btn bg-accent text-accent-ink shadow-glow;
+  }
+  .btn-ghost {
+    @apply btn bg-surface2 text-ink border border-hair;
+  }
+  .label-caps {
+    @apply text-[11px] font-bold uppercase tracking-[0.14em] text-muted;
+  }
+}
+
+::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+/* Respect reduced-motion for the flashy bits */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

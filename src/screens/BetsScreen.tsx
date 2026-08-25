@@ -99,25 +99,20 @@ function OutcomeRow({
         ) : null}
       </div>
       <OddsPill odds={o.odds} tone={stake > 0 ? 'accent' : 'default'} />
-      <Stepper
-        stake={stake}
-        disabled={selfLoss}
-        canAdd={canAdd}
-        onStep={(d) => onStep(o.id, d)}
-      />
+      <Stepper stake={stake} disabled={selfLoss} canAdd={canAdd} onStep={(d) => onStep(o.id, d)} />
     </div>
   );
 }
 
 export function BetsScreen({ onNavigate }: { onNavigate: (s: Screen) => void }) {
-  const { state, me, setMe, betsFor, saveBets } = useTournament();
+  const { state, me, setMe, betsFor, saveBets, canPickIdentity, remote, placed } = useTournament();
   const lineOpen = state.line === 'open';
   const saved = useMemo(() => (me ? toDraft(betsFor(me)) : {}), [me, betsFor]);
   const [draft, setDraft] = useState<Draft>(saved);
   const [syncKey, setSyncKey] = useState(me);
   const [error, setError] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
 
-  // re-seed the draft when the identity changes
   if (syncKey !== me) {
     setSyncKey(me);
     setDraft(saved);
@@ -150,10 +145,12 @@ export function BetsScreen({ onNavigate }: { onNavigate: (s: Screen) => void }) 
     });
   };
 
-  const save = () => {
-    if (!me) return;
+  const save = async () => {
+    if (!me || saving) return;
+    setSaving(true);
     const bets: Bet[] = Object.entries(draft).map(([outcomeId, points]) => ({ outcomeId, points }));
-    const res = saveBets(me, bets);
+    const res = await saveBets(me, bets);
+    setSaving(false);
     if (!res.ok) {
       setError(res.error ?? 'Ошибка');
       hapticNotify('error');
@@ -163,7 +160,7 @@ export function BetsScreen({ onNavigate }: { onNavigate: (s: Screen) => void }) 
     hapticNotify('success');
   };
 
-  useMainButton(Boolean(lineOpen && me && dirty), 'Сохранить ставки', save);
+  useMainButton(Boolean(lineOpen && me && dirty), saving ? 'Сохраняю…' : 'Сохранить ставки', save, !saving);
 
   if (!lineOpen) {
     return (
@@ -185,7 +182,21 @@ export function BetsScreen({ onNavigate }: { onNavigate: (s: Screen) => void }) 
     );
   }
 
-  if (!me) return <IdentityPicker onPick={setMe} />;
+  // Not identified yet.
+  if (!me) {
+    if (canPickIdentity) return <IdentityPicker onPick={setMe} />;
+    return (
+      <div className="card p-5 text-center">
+        <div className="text-4xl">👀</div>
+        <h2 className="mt-2 font-display text-xl font-bold">Только просмотр</h2>
+        <p className="mt-1 text-sm text-muted">
+          Твоего Telegram нет в списке восьми игроков, поэтому ставить нельзя — но следить за линией и
+          табло можно свободно.
+        </p>
+        <div className="mt-3 tnum text-xs text-faint">поставили: {placed.length}/8</div>
+      </div>
+    );
+  }
 
   const grouped = OUTCOMES.filter((o) => o.category === 'group-match');
   const matchIds = [...new Set(grouped.map((o) => (o.category === 'group-match' ? o.matchId : '')))];
@@ -197,18 +208,23 @@ export function BetsScreen({ onNavigate }: { onNavigate: (s: Screen) => void }) 
         {MAX_STAKE} очков на исход. Неиспользованные очки сгорают.
       </Callout>
 
-      {/* budget header */}
       <div className="card sticky top-[64px] z-10 p-3">
         <div className="mb-2 flex items-center justify-between">
-          <button
-            onClick={() => setMe(null)}
-            className="flex items-center gap-2"
-          >
-            <Monogram id={me} size={30} />
-            <span className="text-sm">
-              Ставит <b>{PLAYERS_BY_ID[me].name}</b> · <span className="text-accent underline">сменить</span>
-            </span>
-          </button>
+          {canPickIdentity ? (
+            <button onClick={() => setMe(null)} className="flex items-center gap-2">
+              <Monogram id={me} size={30} />
+              <span className="text-sm">
+                Ставит <b>{PLAYERS_BY_ID[me].name}</b> · <span className="text-accent underline">сменить</span>
+              </span>
+            </button>
+          ) : (
+            <div className="flex items-center gap-2">
+              <Monogram id={me} size={30} ring="accent" />
+              <span className="text-sm">
+                Ты вошёл как <b>{PLAYERS_BY_ID[me].name}</b>
+              </span>
+            </div>
+          )}
           <span className="tnum font-mono text-sm">
             <b className={cx(remaining < 0 ? 'text-lose' : 'text-accent')}>{used}</b>
             <span className="text-faint">/{POINTS_BUDGET}</span>
@@ -223,7 +239,6 @@ export function BetsScreen({ onNavigate }: { onNavigate: (s: Screen) => void }) 
 
       {error && <Callout tone="warn">{error}</Callout>}
 
-      {/* group matches */}
       <section>
         <SectionTitle>{CATEGORY_TITLES['group-match']}</SectionTitle>
         <div className="space-y-2">
@@ -259,19 +274,20 @@ export function BetsScreen({ onNavigate }: { onNavigate: (s: Screen) => void }) 
         </section>
       ))}
 
-      {/* save bar */}
       <div className="sticky bottom-2 z-10">
-        <button className="btn-accent w-full shadow-glow" disabled={!dirty} onClick={save}>
-          {dirty ? `Сохранить ставки (${used}/${POINTS_BUDGET})` : 'Ставки сохранены'}
+        <button className="btn-accent w-full shadow-glow" disabled={!dirty || saving} onClick={save}>
+          {saving ? 'Сохраняю…' : dirty ? `Сохранить ставки (${used}/${POINTS_BUDGET})` : 'Ставки сохранены'}
         </button>
-        {dirty && (
+        {dirty && !saving && (
           <button className="mt-1 w-full py-1 text-xs text-muted" onClick={() => setDraft(saved)}>
             отменить изменения
           </button>
         )}
       </div>
 
-      <p className="px-1 text-center text-xs text-faint">Пока линия открыта, чужие ставки скрыты.</p>
+      <p className="px-1 text-center text-xs text-faint">
+        {remote ? `Пока линия открыта, чужие ставки скрыты. Поставили: ${placed.length}/8.` : 'Пока линия открыта, чужие ставки скрыты.'}
+      </p>
 
       <div className="tnum mt-2 text-center text-xs text-faint">
         линия: {OUTCOMES.length} исходов · кэф {fmtOdds(1.08)}–{fmtOdds(8)}

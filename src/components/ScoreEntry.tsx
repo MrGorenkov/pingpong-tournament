@@ -64,8 +64,8 @@ export function ScoreEntry({ matchId, onClose }: { matchId: string; onClose: () 
 
   const tally = useMemo(() => (match ? tallyMatch(rows, match.target) : null), [rows, match]);
 
-  const submit = () => {
-    const res = setMatchResult(matchId, rows);
+  const submit = async () => {
+    const res = await setMatchResult(matchId, rows);
     if (!res.ok) {
       setError(res.error ?? 'Ошибка');
       hapticNotify('error');
@@ -97,8 +97,8 @@ export function ScoreEntry({ matchId, onClose }: { matchId: string; onClose: () 
           <div className="flex gap-2">
             <button
               className="btn-ghost flex-1 text-sm"
-              onClick={() => {
-                voidMatch(matchId);
+              onClick={async () => {
+                await voidMatch(matchId);
                 hapticImpact('soft');
                 onClose();
               }}
@@ -107,8 +107,8 @@ export function ScoreEntry({ matchId, onClose }: { matchId: string; onClose: () 
             </button>
             <button
               className="btn-ghost flex-1 text-sm"
-              onClick={() => {
-                clearMatch(matchId);
+              onClick={async () => {
+                await clearMatch(matchId);
                 onClose();
               }}
             >

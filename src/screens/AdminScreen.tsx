@@ -23,13 +23,11 @@ function AdminMatchRow({
 }) {
   const ready = Boolean(match.a && match.b);
   const scoreText =
-    match.status === 'complete'
+    match.status === 'complete' || match.status === 'live'
       ? `${match.setsA}:${match.setsB}`
       : match.status === 'void'
         ? '—'
-        : match.status === 'live'
-          ? `${match.setsA}:${match.setsB}`
-          : '·';
+        : '·';
   return (
     <div className="flex items-center gap-2 py-2">
       <div className="min-w-0 flex-1">
@@ -61,20 +59,45 @@ export function AdminScreen({
   onEnterScore: (id: string) => void;
   onNavigate: (s: Screen) => void;
 }) {
-  const { state, view, openLine, closeLine, resetTournament } = useTournament();
+  const { state, view, openLine, closeLine, resetTournament, remote, isAdmin, username } = useTournament();
   const lineOpen = state.line === 'open';
   const hasResults = Object.keys(state.results).length > 0;
 
   const [confirmReset, setConfirmReset] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
   useEffect(() => {
     if (!confirmReset) return;
     const t = setTimeout(() => setConfirmReset(false), 3000);
     return () => clearTimeout(t);
   }, [confirmReset]);
 
+  if (remote && !isAdmin) {
+    return (
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h1 className="font-display text-xl font-extrabold">⚙️ Админка</h1>
+          <button className="btn-ghost px-3 py-1.5 text-sm" onClick={onBack}>
+            Назад
+          </button>
+        </div>
+        <Callout tone="warn">
+          Панель только для админа{username ? ` (сейчас ты @${username})` : ''}. Ввод счёта, линия и сброс — у
+          организатора.
+        </Callout>
+      </div>
+    );
+  }
+
   const groupA = view.groupMatches.filter((m) => m.group === 'A');
   const groupB = view.groupMatches.filter((m) => m.group === 'B');
   const playoff = [...view.bracket.semifinals, view.bracket.final, view.bracket.third];
+
+  const run = async (fn: () => Promise<{ ok: boolean; error?: string }>, after?: () => void) => {
+    setErr(null);
+    const r = await fn();
+    if (!r.ok) setErr(r.error ?? 'Ошибка');
+    else after?.();
+  };
 
   return (
     <div className="space-y-4">
@@ -85,7 +108,8 @@ export function AdminScreen({
         </button>
       </div>
 
-      {/* line control */}
+      {err && <Callout tone="warn">{err}</Callout>}
+
       <section>
         <SectionTitle>Линия ставок</SectionTitle>
         <div className="card space-y-3 p-4">
@@ -100,11 +124,12 @@ export function AdminScreen({
               <Callout>Линия закрывается до первого матча. После закрытия ставки не редактируются, и все ставки раскрываются разом.</Callout>
               <button
                 className="btn-accent w-full"
-                onClick={() => {
-                  hapticImpact('heavy');
-                  closeLine();
-                  onNavigate('reveal');
-                }}
+                onClick={() =>
+                  run(closeLine, () => {
+                    hapticImpact('heavy');
+                    onNavigate('reveal');
+                  })
+                }
               >
                 Закрыть линию и раскрыть ставки
               </button>
@@ -116,11 +141,8 @@ export function AdminScreen({
               </button>
               <button
                 className="btn-ghost flex-1 text-sm"
-                onClick={() => {
-                  if (hasResults) return;
-                  openLine();
-                }}
-                title={hasResults ? 'Уже введены счета' : ''}
+                disabled={hasResults}
+                onClick={() => run(openLine)}
               >
                 {hasResults ? 'Открыть нельзя' : 'Открыть заново'}
               </button>
@@ -129,7 +151,6 @@ export function AdminScreen({
         </div>
       </section>
 
-      {/* results */}
       <section>
         <SectionTitle>Ввод счетов</SectionTitle>
         {lineOpen && <Callout tone="warn">Чтобы вводить счёт, сначала закройте линию ставок.</Callout>}
@@ -161,17 +182,17 @@ export function AdminScreen({
         </div>
       </section>
 
-      {/* danger */}
       <section>
         <SectionTitle>Опасная зона</SectionTitle>
         <button
           className={cx('btn w-full', confirmReset ? 'bg-lose text-white' : 'btn-ghost')}
           onClick={() => {
             if (confirmReset) {
-              resetTournament();
               setConfirmReset(false);
-              hapticImpact('heavy');
-              onBack();
+              run(resetTournament, () => {
+                hapticImpact('heavy');
+                onBack();
+              });
             } else {
               setConfirmReset(true);
             }

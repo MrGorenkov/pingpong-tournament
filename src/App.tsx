@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { TournamentProvider, useTournament } from './state/TournamentContext';
 import { Header } from './components/Header';
 import { TabBar } from './components/TabBar';
@@ -16,6 +16,13 @@ function Shell() {
   const { loading, state } = useTournament();
   const [screen, setScreen] = useState<Screen>('home');
   const [scoreMatchId, setScoreMatchId] = useState<string | null>(null);
+
+  // When the line closes (locally or seen via sync), everyone gets the reveal.
+  const prevLine = useRef<string | null>(null);
+  useEffect(() => {
+    if (prevLine.current === 'open' && state.line === 'closed') setScreen('reveal');
+    prevLine.current = state.line;
+  }, [state.line]);
 
   if (loading) {
     return (

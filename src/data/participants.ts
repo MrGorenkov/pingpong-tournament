@@ -1,11 +1,15 @@
 import type { GroupId, Player, PlayerId } from '../types';
 
-/** Seeded 1..8 by descending strength; split into two groups of four. */
+/**
+ * Seeded 1..8 by descending strength; split into two balanced groups (snake
+ * seeding: A = 1,4,5,8 · B = 2,3,6,7). Давид снялся — вместо него Тимур (посев 4),
+ * топ-4 сдвинулись вверх, места 5–8 без изменений.
+ */
 export const PLAYERS: Player[] = [
-  { id: 'david', name: 'Давид', seed: 1, group: 'A' },
-  { id: 'tolyan', name: 'Толян', seed: 2, group: 'B' },
-  { id: 'islam', name: 'Ислам', seed: 3, group: 'B' },
-  { id: 'misha', name: 'Миша', seed: 4, group: 'A' },
+  { id: 'tolyan', name: 'Толян', seed: 1, group: 'A' },
+  { id: 'islam', name: 'Ислам', seed: 2, group: 'B' },
+  { id: 'misha', name: 'Миша', seed: 3, group: 'B' },
+  { id: 'timur', name: 'Тимур', seed: 4, group: 'A' },
   { id: 'galim', name: 'Галим', seed: 5, group: 'A' },
   { id: 'isa', name: 'Иса', seed: 6, group: 'B' },
   { id: 'vanek', name: 'Ванёк', seed: 7, group: 'B' },

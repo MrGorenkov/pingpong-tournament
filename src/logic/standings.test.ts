@@ -5,7 +5,7 @@ import { GROUPS } from '../data/participants';
 import { tallyMatch } from './setScore';
 import { computeStandings } from './standings';
 
-const A: Player[] = GROUPS.A; // david(1), misha(4), galim(5), sanek(8)
+const A: Player[] = GROUPS.A; // tolyan(1), timur(4), galim(5), sanek(8)
 
 /** Build a completed MatchView from a scoreline like [[11,9],[11,7]]. */
 function mv(a: PlayerId, b: PlayerId, scoreline: [number, number][]): MatchView {
@@ -34,74 +34,68 @@ const order = (rows: { playerId: PlayerId }[]) => rows.map((r) => r.playerId);
 describe('computeStandings', () => {
   it('ranks by wins with no ties', () => {
     const matches = [
-      mv('david', 'misha', [[11, 5], [11, 5]]),
-      mv('david', 'galim', [[11, 5], [11, 5]]),
-      mv('david', 'sanek', [[11, 5], [11, 5]]),
-      mv('misha', 'galim', [[11, 5], [11, 5]]),
-      mv('misha', 'sanek', [[11, 5], [11, 5]]),
+      mv('tolyan', 'timur', [[11, 5], [11, 5]]),
+      mv('tolyan', 'galim', [[11, 5], [11, 5]]),
+      mv('tolyan', 'sanek', [[11, 5], [11, 5]]),
+      mv('timur', 'galim', [[11, 5], [11, 5]]),
+      mv('timur', 'sanek', [[11, 5], [11, 5]]),
       mv('galim', 'sanek', [[11, 5], [11, 5]]),
     ];
     const rows = computeStandings(A, matches);
-    expect(order(rows)).toEqual(['david', 'misha', 'galim', 'sanek']);
-    expect(rows.filter((r) => r.qualified).map((r) => r.playerId)).toEqual(['david', 'misha']);
+    expect(order(rows)).toEqual(['tolyan', 'timur', 'galim', 'sanek']);
+    expect(rows.filter((r) => r.qualified).map((r) => r.playerId)).toEqual(['tolyan', 'timur']);
     expect(rows[0].wins).toBe(3);
     expect(rows[3].wins).toBe(0);
   });
 
   it('empty group falls back to seed order deterministically', () => {
     const rows = computeStandings(A, []);
-    expect(order(rows)).toEqual(['david', 'misha', 'galim', 'sanek']);
+    expect(order(rows)).toEqual(['tolyan', 'timur', 'galim', 'sanek']);
   });
 
   it('breaks a two-way tie by head-to-head even against a better set/point diff', () => {
-    // david & misha both finish 2-1; galim & sanek both 1-2.
-    // misha crushes his wins; david wins his narrowly and loses badly to sanek,
-    // so misha has the better overall diff — but david beat misha head-to-head.
     const matches = [
-      mv('david', 'misha', [[11, 9], [11, 9]]), // david beats misha (H2H)
-      mv('david', 'galim', [[11, 9], [11, 9]]),
-      mv('sanek', 'david', [[11, 2], [11, 2]]), // david loses badly
-      mv('misha', 'galim', [[11, 1], [11, 1]]), // misha crushes
-      mv('misha', 'sanek', [[11, 1], [11, 1]]), // misha crushes
+      mv('tolyan', 'timur', [[11, 9], [11, 9]]), // tolyan beats timur (H2H)
+      mv('tolyan', 'galim', [[11, 9], [11, 9]]),
+      mv('sanek', 'tolyan', [[11, 2], [11, 2]]), // tolyan loses badly
+      mv('timur', 'galim', [[11, 1], [11, 1]]), // timur crushes
+      mv('timur', 'sanek', [[11, 1], [11, 1]]), // timur crushes
       mv('galim', 'sanek', [[11, 9], [11, 9]]),
     ];
     const rows = computeStandings(A, matches);
-    // david 2 (misha, galim), misha 2 (galim, sanek), galim 1 (sanek), sanek 1 (david)
-    expect(rows.find((r) => r.playerId === 'david')!.wins).toBe(2);
-    expect(rows.find((r) => r.playerId === 'misha')!.wins).toBe(2);
-    expect(order(rows).slice(0, 2)).toEqual(['david', 'misha']); // H2H wins over diff
+    // tolyan 2 (timur, galim), timur 2 (galim, sanek), galim 1 (sanek), sanek 1 (tolyan)
+    expect(rows.find((r) => r.playerId === 'tolyan')!.wins).toBe(2);
+    expect(rows.find((r) => r.playerId === 'timur')!.wins).toBe(2);
+    expect(order(rows).slice(0, 2)).toEqual(['tolyan', 'timur']); // H2H wins over diff
     expect(order(rows).slice(2)).toEqual(['galim', 'sanek']); // galim beat sanek
   });
 
   it('breaks a three-way cycle by mini-table set difference', () => {
     const matches = [
-      // everyone beats sanek -> david/misha/galim all reach 2 wins
-      mv('david', 'sanek', [[11, 5], [11, 5]]),
-      mv('misha', 'sanek', [[11, 5], [11, 5]]),
+      mv('tolyan', 'sanek', [[11, 5], [11, 5]]),
+      mv('timur', 'sanek', [[11, 5], [11, 5]]),
       mv('galim', 'sanek', [[11, 5], [11, 5]]),
-      // cycle among the three
-      mv('david', 'misha', [[11, 5], [11, 5]]), // david +2 sets in mini
-      mv('misha', 'galim', [[11, 9], [9, 11], [11, 9]]), // misha +1 set in mini
-      mv('galim', 'david', [[11, 9], [9, 11], [11, 9]]), // galim +1 set in mini
+      mv('tolyan', 'timur', [[11, 5], [11, 5]]), // tolyan +2 sets in mini
+      mv('timur', 'galim', [[11, 9], [9, 11], [11, 9]]), // timur +1 set in mini
+      mv('galim', 'tolyan', [[11, 9], [9, 11], [11, 9]]), // galim +1 set in mini
     ];
     const rows = computeStandings(A, matches);
-    // mini set diff: david +1, galim 0, misha -1
-    expect(order(rows)).toEqual(['david', 'galim', 'misha', 'sanek']);
-    expect(rows.filter((r) => r.qualified).map((r) => r.playerId)).toEqual(['david', 'galim']);
+    // mini set diff: tolyan +1, galim 0, timur -1
+    expect(order(rows)).toEqual(['tolyan', 'galim', 'timur', 'sanek']);
+    expect(rows.filter((r) => r.qualified).map((r) => r.playerId)).toEqual(['tolyan', 'galim']);
   });
 
   it('breaks a three-way cycle by mini-table point difference when set diffs tie', () => {
     const matches = [
-      mv('david', 'sanek', [[11, 5], [11, 5]]),
-      mv('misha', 'sanek', [[11, 5], [11, 5]]),
+      mv('tolyan', 'sanek', [[11, 5], [11, 5]]),
+      mv('timur', 'sanek', [[11, 5], [11, 5]]),
       mv('galim', 'sanek', [[11, 5], [11, 5]]),
-      // cycle, each 2-1 -> every mini set diff is 0, so points decide
-      mv('david', 'misha', [[11, 9], [9, 11], [11, 5]]), // david +6 pts vs misha
-      mv('misha', 'galim', [[11, 9], [9, 11], [11, 9]]), // misha +2 pts vs galim
-      mv('galim', 'david', [[11, 9], [9, 11], [11, 9]]), // galim +2 pts vs david
+      mv('tolyan', 'timur', [[11, 9], [9, 11], [11, 5]]), // tolyan +6 pts vs timur
+      mv('timur', 'galim', [[11, 9], [9, 11], [11, 9]]), // timur +2 pts vs galim
+      mv('galim', 'tolyan', [[11, 9], [9, 11], [11, 9]]), // galim +2 pts vs tolyan
     ];
     const rows = computeStandings(A, matches);
-    // mini point diff: david +4, galim 0, misha -4
-    expect(order(rows)).toEqual(['david', 'galim', 'misha', 'sanek']);
+    // mini point diff: tolyan +4, galim 0, timur -4
+    expect(order(rows)).toEqual(['tolyan', 'galim', 'timur', 'sanek']);
   });
 });

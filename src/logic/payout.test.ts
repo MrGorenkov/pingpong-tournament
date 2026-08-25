@@ -135,9 +135,9 @@ describe('computePayout', () => {
 
   it('edge B: only one player has points -> takes all 800', () => {
     const st = emptyState();
-    // david (1) beats sanek (8): no upset, so no bonus muddies the pool.
-    st.results['gA-david-sanek'] = { sets: [{ a: 11, b: 2 }, { a: 11, b: 2 }] };
-    st.bets = { misha: [{ outcomeId: 'm:gA-david-sanek:david', points: 10 }] };
+    // tolyan (1) beats sanek (8): no upset, so no bonus muddies the pool.
+    st.results['gA-tolyan-sanek'] = { sets: [{ a: 11, b: 2 }, { a: 11, b: 2 }] };
+    st.bets = { misha: [{ outcomeId: 'm:gA-tolyan-sanek:tolyan', points: 10 }] };
     const payout = computePayout(buildView(st), st.bets);
     expect(payout.refundMode).toBe(false);
     expect(payout.entries.find((e) => e.playerId === 'misha')!.rub).toBe(800);

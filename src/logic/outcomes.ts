@@ -25,12 +25,12 @@ function outOfFinal(view: TournamentView, player: PlayerId): boolean {
   return false;
 }
 
-function davidSetsLost(view: TournamentView): number {
+function tolyanSetsLost(view: TournamentView): number {
   let lost = 0;
   for (const m of view.allMatches) {
     if (m.status !== 'complete') continue;
-    if (m.a === 'david') lost += m.setsB;
-    else if (m.b === 'david') lost += m.setsA;
+    if (m.a === 'tolyan') lost += m.setsB;
+    else if (m.b === 'tolyan') lost += m.setsA;
   }
   return lost;
 }
@@ -47,27 +47,27 @@ const BOTTOM_FOUR: PlayerId[] = ['galim', 'isa', 'vanek', 'sanek'];
 
 function resolveSpecial(kind: SpecialKind, view: TournamentView): OutcomeStatus {
   switch (kind) {
-    case 'final-david-tolyan': {
+    case 'final-tolyan-islam': {
       const finalists = finalistsOf(view);
       if (finalists) {
         const set = new Set(finalists);
-        return set.has('david') && set.has('tolyan') ? 'won' : 'lost';
+        return set.has('tolyan') && set.has('islam') ? 'won' : 'lost';
       }
-      if (outOfFinal(view, 'david') || outOfFinal(view, 'tolyan')) return 'lost';
+      if (outOfFinal(view, 'tolyan') || outOfFinal(view, 'islam')) return 'lost';
       return 'pending';
     }
-    case 'david-group-sweep': {
-      const dm = view.groupMatches.filter((m) => m.a === 'david' || m.b === 'david');
-      if (dm.some((m) => m.status === 'complete' && m.winner !== 'david')) return 'lost';
+    case 'tolyan-group-sweep': {
+      const gm = view.groupMatches.filter((m) => m.a === 'tolyan' || m.b === 'tolyan');
+      if (gm.some((m) => m.status === 'complete' && m.winner !== 'tolyan')) return 'lost';
       if (!view.groupComplete.A) return 'pending';
-      const wonAllPlayed = dm
+      const wonAllPlayed = gm
         .filter((m) => m.status === 'complete')
-        .every((m) => m.winner === 'david');
+        .every((m) => m.winner === 'tolyan');
       const q = view.qualifiers.A;
-      return wonAllPlayed && !!q && q.includes('david') ? 'won' : 'lost';
+      return wonAllPlayed && !!q && q.includes('tolyan') ? 'won' : 'lost';
     }
-    case 'david-no-set-lost': {
-      if (davidSetsLost(view) > 0) return 'lost';
+    case 'tolyan-no-set-lost': {
+      if (tolyanSetsLost(view) > 0) return 'lost';
       if (view.bracket.final.status === 'complete') return 'won';
       return 'pending';
     }

@@ -5,7 +5,7 @@
 // ============================================================================
 
 export type PlayerId =
-  | 'david'
+  | 'timur'
   | 'tolyan'
   | 'islam'
   | 'misha'
@@ -70,9 +70,9 @@ export type OutcomeCategory =
   | 'special';
 
 export type SpecialKind =
-  | 'final-david-tolyan'
-  | 'david-group-sweep'
-  | 'david-no-set-lost'
+  | 'final-tolyan-islam'
+  | 'tolyan-group-sweep'
+  | 'tolyan-no-set-lost'
   | 'bottom4-in-top4'
   | 'vanek-or-sanek-wins'
   | 'upset-3plus'

@@ -3,47 +3,48 @@ import { playerName } from './participants';
 import { groupMatchId } from './schedule';
 
 // ============================================================================
-// The betting line, hard-coded as data. Each entry below is one bettable
-// outcome. Odds are POINT multipliers (not rubles) — see logic/payout.ts.
+// The betting line, hard-coded as data. Odds are POINT multipliers (not rubles).
+// The snake re-seed keeps each group's seed structure identical (A = 1,4,5,8 ·
+// B = 2,3,6,7), so the whole seed-based line simply maps onto the new lineup.
 // ============================================================================
 
-/** [favorite, underdog, favOdds, dogOdds] — the favorite beats the underdog. */
+/** [favorite, underdog, favOdds, dogOdds] — the favorite (higher seed) wins. */
 type MatchOdds = [PlayerId, PlayerId, number, number];
 
 const GROUP_A_MATCH_ODDS: MatchOdds[] = [
-  ['david', 'sanek', 1.12, 8.0],
-  ['david', 'galim', 1.16, 5.5],
-  ['david', 'misha', 1.22, 4.2],
-  ['misha', 'sanek', 1.16, 5.5],
-  ['galim', 'sanek', 1.22, 4.2],
-  ['misha', 'galim', 1.55, 2.35],
+  ['tolyan', 'timur', 1.22, 4.2], // 1 vs 4
+  ['tolyan', 'galim', 1.16, 5.5], // 1 vs 5
+  ['tolyan', 'sanek', 1.12, 8.0], // 1 vs 8
+  ['timur', 'galim', 1.55, 2.35], // 4 vs 5
+  ['timur', 'sanek', 1.16, 5.5], // 4 vs 8
+  ['galim', 'sanek', 1.22, 4.2], // 5 vs 8
 ];
 
 const GROUP_B_MATCH_ODDS: MatchOdds[] = [
-  ['tolyan', 'vanek', 1.14, 6.5],
-  ['tolyan', 'isa', 1.16, 5.5],
-  ['islam', 'vanek', 1.16, 5.5],
-  ['islam', 'isa', 1.22, 4.2],
-  ['tolyan', 'islam', 1.55, 2.35],
-  ['isa', 'vanek', 1.55, 2.35],
+  ['islam', 'misha', 1.55, 2.35], // 2 vs 3
+  ['islam', 'isa', 1.16, 5.5], // 2 vs 6
+  ['islam', 'vanek', 1.14, 6.5], // 2 vs 7
+  ['misha', 'isa', 1.22, 4.2], // 3 vs 6
+  ['misha', 'vanek', 1.16, 5.5], // 3 vs 7
+  ['isa', 'vanek', 1.55, 2.35], // 6 vs 7
 ];
 
 const GROUP_EXIT_ODDS: [PlayerId, number][] = [
-  ['david', 1.08],
-  ['misha', 1.55],
+  ['tolyan', 1.08],
+  ['timur', 1.55],
   ['galim', 2.5],
   ['sanek', 8.0],
-  ['tolyan', 1.13],
-  ['islam', 1.28],
+  ['islam', 1.13],
+  ['misha', 1.28],
   ['isa', 3.6],
   ['vanek', 6.5],
 ];
 
 const REACH_FINAL_ODDS: [PlayerId, number][] = [
-  ['david', 1.55],
-  ['tolyan', 2.2],
-  ['islam', 3.1],
-  ['misha', 3.8],
+  ['tolyan', 1.55],
+  ['islam', 2.2],
+  ['misha', 3.1],
+  ['timur', 3.8],
   ['galim', 7.0],
   ['isa', 8.0],
   ['vanek', 8.0],
@@ -51,10 +52,10 @@ const REACH_FINAL_ODDS: [PlayerId, number][] = [
 ];
 
 const CHAMPION_ODDS: [PlayerId, number][] = [
-  ['david', 2.4],
-  ['tolyan', 4.5],
-  ['islam', 6.0],
-  ['misha', 6.5],
+  ['tolyan', 2.4],
+  ['islam', 4.5],
+  ['misha', 6.0],
+  ['timur', 6.5],
   ['galim', 7.5],
   ['isa', 8.0],
   ['vanek', 8.0],
@@ -62,9 +63,9 @@ const CHAMPION_ODDS: [PlayerId, number][] = [
 ];
 
 const SPECIAL_ODDS: { kind: SpecialKind; odds: number; label: string; sub?: string }[] = [
-  { kind: 'final-david-tolyan', odds: 3.5, label: 'Финал: Давид – Толян', sub: 'оба выходят в финал' },
-  { kind: 'david-group-sweep', odds: 1.5, label: 'Давид пройдёт группу без поражений' },
-  { kind: 'david-no-set-lost', odds: 4.5, label: 'Давид не отдаст ни одной партии', sub: 'за весь турнир' },
+  { kind: 'final-tolyan-islam', odds: 3.5, label: 'Финал: Толян – Ислам', sub: 'оба выходят в финал' },
+  { kind: 'tolyan-group-sweep', odds: 1.5, label: 'Толян пройдёт группу без поражений' },
+  { kind: 'tolyan-no-set-lost', odds: 4.5, label: 'Толян не отдаст ни одной партии', sub: 'за весь турнир' },
   { kind: 'bottom4-in-top4', odds: 4.0, label: 'Кто-то из нижней четвёрки (5–8) в топ-4' },
   { kind: 'vanek-or-sanek-wins', odds: 1.8, label: 'Ванёк или Санёк возьмёт хотя бы один матч' },
   { kind: 'upset-3plus', odds: 2.2, label: 'Будет апсет с разницей 3+ позиции' },

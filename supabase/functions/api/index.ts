@@ -14,7 +14,7 @@ const USERNAME_TO_PLAYER: Record<string, string> = {
   e_m_v_4: 'misha',
   pbppbpb: 'timur',
   wallflower2: 'galim',
-  iisaev99: 'isa',
+  misha_mosolov: 'isa',
   vaaancho: 'vanek',
   alex_gorenkov: 'sanek',
 };

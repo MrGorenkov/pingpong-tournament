@@ -1,4 +1,5 @@
 import type { GroupId, MatchView, Outcome, OutcomeStatus, PlayerId, SpecialKind, TournamentView } from '../types';
+import { PLAYER_COUNT } from '../data/rules';
 
 // --- small helpers -------------------------------------------------------
 
@@ -43,7 +44,7 @@ function finalScore(view: TournamentView, loserSets: number): OutcomeStatus {
   return hi === 3 && lo === loserSets ? 'won' : 'lost';
 }
 
-const BOTTOM_FOUR: PlayerId[] = ['galim', 'isa', 'vanek', 'sanek'];
+const BOTTOM_FOUR: PlayerId[] = ['galim', 'vanek', 'sanek'];
 
 function resolveSpecial(kind: SpecialKind, view: TournamentView): OutcomeStatus {
   switch (kind) {
@@ -100,7 +101,7 @@ function resolveSpecial(kind: SpecialKind, view: TournamentView): OutcomeStatus 
     }
     case 'sanek-not-last': {
       if (!view.groupComplete.A || !view.groupComplete.B) return 'pending';
-      const last = view.finalStandings[7];
+      const last = view.finalStandings[PLAYER_COUNT - 1];
       if (!last) return 'pending';
       return last === 'sanek' ? 'lost' : 'won';
     }

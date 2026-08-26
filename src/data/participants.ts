@@ -11,10 +11,10 @@ export const PLAYERS: Player[] = [
   { id: 'misha', name: 'Миша', seed: 3, group: 'B' },
   { id: 'timur', name: 'Тимур', seed: 4, group: 'A' },
   { id: 'galim', name: 'Галим', seed: 5, group: 'A' },
-  { id: 'isa', name: 'Миха', seed: 6, group: 'B' },
   { id: 'vanek', name: 'Ванёк', seed: 7, group: 'B' },
   { id: 'sanek', name: 'Санёк', seed: 8, group: 'A' },
 ];
+// Миха (посев 6, был id 'isa') снялся — играем всемером, группа B = тройка.
 
 export const PLAYERS_BY_ID: Record<PlayerId, Player> = PLAYERS.reduce(
   (acc, p) => {

@@ -1,5 +1,5 @@
 import { useTournament } from '../state/TournamentContext';
-import { BANK_RUB } from '../data/rules';
+import { BANK_RUB, PLAYER_COUNT } from '../data/rules';
 import { PLAYERS_BY_ID } from '../data/participants';
 import type { Screen } from '../lib/nav';
 import { matchStageLabel } from '../lib/labels';
@@ -83,7 +83,7 @@ export function HomeScreen({
             <span className="tnum font-mono text-2xl font-extrabold text-accent">{fmtRub(BANK_RUB)}</span>
           </div>
           <p className="mt-2 text-xs leading-relaxed text-muted">
-            Кэфы — множители <b>очков</b>, а не рублей. Банк всегда ровно 800 ₽ (8×100). Результаты на
+            Кэфы — множители <b>очков</b>, а не рублей. Банк всегда ровно {BANK_RUB} ₽ ({PLAYER_COUNT}×100). Результаты на
             столе тоже капают очки в этот же пул.
           </p>
           <button className="btn-ghost mt-3 w-full text-sm" onClick={() => onNavigate('board')}>

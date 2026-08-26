@@ -10,7 +10,6 @@ export type PlayerId =
   | 'islam'
   | 'misha'
   | 'galim'
-  | 'isa'
   | 'vanek'
   | 'sanek';
 

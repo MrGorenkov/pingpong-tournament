@@ -4,8 +4,9 @@ import { groupMatchId } from './schedule';
 
 // ============================================================================
 // The betting line, hard-coded as data. Odds are POINT multipliers (not rubles).
-// The snake re-seed keeps each group's seed structure identical (A = 1,4,5,8 ·
-// B = 2,3,6,7), so the whole seed-based line simply maps onto the new lineup.
+// Миха снялся -> играем всемером: группа A = четвёрка, группа B = тройка.
+// Матчевые кэфы едут по посеву; кэфы «выхода из группы B» пересчитаны под троих
+// (из тройки выходят двое, поэтому шансы выше).
 // ============================================================================
 
 /** [favorite, underdog, favOdds, dogOdds] — the favorite (higher seed) wins. */
@@ -20,44 +21,41 @@ const GROUP_A_MATCH_ODDS: MatchOdds[] = [
   ['galim', 'sanek', 1.22, 4.2], // 5 vs 8
 ];
 
+// Group B is a 3-player round robin (Ислам 2, Миша 3, Ванёк 7).
 const GROUP_B_MATCH_ODDS: MatchOdds[] = [
   ['islam', 'misha', 1.55, 2.35], // 2 vs 3
-  ['islam', 'isa', 1.16, 5.5], // 2 vs 6
   ['islam', 'vanek', 1.14, 6.5], // 2 vs 7
-  ['misha', 'isa', 1.22, 4.2], // 3 vs 6
   ['misha', 'vanek', 1.16, 5.5], // 3 vs 7
-  ['isa', 'vanek', 1.55, 2.35], // 6 vs 7
 ];
 
 const GROUP_EXIT_ODDS: [PlayerId, number][] = [
+  // group A (4 players, top 2 advance)
   ['tolyan', 1.08],
   ['timur', 1.55],
   ['galim', 2.5],
   ['sanek', 8.0],
-  ['islam', 1.13],
-  ['misha', 1.28],
-  ['isa', 3.6],
-  ['vanek', 6.5],
+  // group B (3 players, top 2 advance -> only one is eliminated)
+  ['islam', 1.06],
+  ['misha', 1.22],
+  ['vanek', 2.2],
 ];
 
 const REACH_FINAL_ODDS: [PlayerId, number][] = [
   ['tolyan', 1.55],
-  ['islam', 2.2],
-  ['misha', 3.1],
+  ['islam', 2.1],
+  ['misha', 2.9],
   ['timur', 3.8],
   ['galim', 7.0],
-  ['isa', 8.0],
-  ['vanek', 8.0],
+  ['vanek', 6.5],
   ['sanek', 8.0],
 ];
 
 const CHAMPION_ODDS: [PlayerId, number][] = [
   ['tolyan', 2.4],
-  ['islam', 4.5],
-  ['misha', 6.0],
+  ['islam', 4.2],
+  ['misha', 5.5],
   ['timur', 6.5],
   ['galim', 7.5],
-  ['isa', 8.0],
   ['vanek', 8.0],
   ['sanek', 8.0],
 ];
@@ -66,8 +64,8 @@ const SPECIAL_ODDS: { kind: SpecialKind; odds: number; label: string; sub?: stri
   { kind: 'final-tolyan-islam', odds: 3.5, label: 'Финал: Толян – Ислам', sub: 'оба выходят в финал' },
   { kind: 'tolyan-group-sweep', odds: 1.5, label: 'Толян пройдёт группу без поражений' },
   { kind: 'tolyan-no-set-lost', odds: 4.5, label: 'Толян не отдаст ни одной партии', sub: 'за весь турнир' },
-  { kind: 'bottom4-in-top4', odds: 4.0, label: 'Кто-то из нижней четвёрки (5–8) в топ-4' },
-  { kind: 'vanek-or-sanek-wins', odds: 1.8, label: 'Ванёк или Санёк возьмёт хотя бы один матч' },
+  { kind: 'bottom4-in-top4', odds: 1.65, label: 'Кто-то снизу посева (5, 7, 8) в топ-4' },
+  { kind: 'vanek-or-sanek-wins', odds: 1.55, label: 'Ванёк или Санёк возьмёт хотя бы один матч' },
   { kind: 'upset-3plus', odds: 2.2, label: 'Будет апсет с разницей 3+ позиции' },
   { kind: 'sanek-not-last', odds: 3.0, label: 'Санёк не останется последним' },
   { kind: 'final-3-0', odds: 3.5, label: 'Финал завершится 3:0' },

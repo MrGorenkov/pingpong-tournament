@@ -26,7 +26,7 @@ export function LeaderboardScreen() {
         </div>
         <p className="mt-2 text-xs leading-relaxed text-muted">
           Очки = ставки (кэф × ставка) + бонусы за результат. Доля в банке = очки игрока ÷ сумма всех
-          очков × 800 ₽.
+          очков × {BANK_RUB} ₽.
         </p>
       </div>
 
@@ -120,7 +120,7 @@ export function LeaderboardScreen() {
 
       <p className="px-1 text-center text-xs leading-relaxed text-faint">
         Взнос {fmtRub(ENTRY_FEE_RUB)} с человека: {TABLE_FEE_RUB} стол + {POOL_FEE_RUB} ставки.
-        Отдельных призовых за места нет — единственные деньги в игре это банк 800 ₽.
+        Отдельных призовых за места нет — единственные деньги в игре это банк {BANK_RUB} ₽.
       </p>
     </div>
   );

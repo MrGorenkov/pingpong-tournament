@@ -130,7 +130,7 @@ describe('computePayout', () => {
     const payout = computePayout(buildView(emptyState()), {});
     expect(payout.refundMode).toBe(true);
     expect(payout.entries.every((e) => e.rub === 100)).toBe(true);
-    expect(payout.entries.reduce((s, e) => s + e.rub, 0)).toBe(800);
+    expect(payout.entries.reduce((s, e) => s + e.rub, 0)).toBe(BANK_RUB);
   });
 
   it('edge B: only one player has points -> takes all 800', () => {
@@ -140,7 +140,7 @@ describe('computePayout', () => {
     st.bets = { misha: [{ outcomeId: 'm:gA-tolyan-sanek:tolyan', points: 10 }] };
     const payout = computePayout(buildView(st), st.bets);
     expect(payout.refundMode).toBe(false);
-    expect(payout.entries.find((e) => e.playerId === 'misha')!.rub).toBe(800);
-    expect(payout.entries.reduce((s, e) => s + e.rub, 0)).toBe(800);
+    expect(payout.entries.find((e) => e.playerId === 'misha')!.rub).toBe(BANK_RUB);
+    expect(payout.entries.reduce((s, e) => s + e.rub, 0)).toBe(BANK_RUB);
   });
 });

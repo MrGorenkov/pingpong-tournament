@@ -1,7 +1,7 @@
 // Single source of truth for every magic number in the tournament + pool.
 
-export const BANK_RUB = 800; // 8 players x 100 rub, fixed
-export const PLAYER_COUNT = 8;
+export const BANK_RUB = 700; // 7 players x 100 rub (Миха снялся), fixed
+export const PLAYER_COUNT = 7;
 
 // entry breakdown (per person), purely informational on screen
 export const ENTRY_FEE_RUB = 260;

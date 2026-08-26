@@ -14,12 +14,11 @@ const USERNAME_TO_PLAYER: Record<string, string> = {
   e_m_v_4: 'misha',
   pbppbpb: 'timur',
   wallflower2: 'galim',
-  misha_mosolov: 'isa',
   vaaancho: 'vanek',
   alex_gorenkov: 'sanek',
 };
 const ADMINS = new Set(['alex_gorenkov']);
-const PLAYERS = new Set(['tolyan', 'islam', 'misha', 'timur', 'galim', 'isa', 'vanek', 'sanek']);
+const PLAYERS = new Set(['tolyan', 'islam', 'misha', 'timur', 'galim', 'vanek', 'sanek']);
 const SPECIALS = new Set([
   'final-tolyan-islam', 'tolyan-group-sweep', 'tolyan-no-set-lost', 'bottom4-in-top4',
   'vanek-or-sanek-wins', 'upset-3plus', 'sanek-not-last', 'final-3-0', 'final-3-1', 'final-3-2',

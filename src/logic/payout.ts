@@ -110,6 +110,6 @@ export function computePayout(view: TournamentView, bets: Partial<Record<PlayerI
     totalPoints: round2(totalPoints),
     bank: BANK_RUB,
     refundMode,
-    lastPlace: view.finalStandings[7] ?? null,
+    lastPlace: view.finalStandings[PLAYER_COUNT - 1] ?? null,
   };
 }

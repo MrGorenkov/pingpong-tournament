@@ -3,7 +3,7 @@ import type { Bet, Outcome, PlayerId } from '../types';
 import { useTournament } from '../state/TournamentContext';
 import { CATEGORY_TITLES, OUTCOMES } from '../data/odds';
 import { PLAYERS, PLAYERS_BY_ID } from '../data/participants';
-import { MAX_STAKE, MIN_STAKE, POINTS_BUDGET } from '../data/rules';
+import { BANK_RUB, MAX_STAKE, MIN_STAKE, PLAYER_COUNT, POINTS_BUDGET } from '../data/rules';
 import { isSelfLoss } from '../logic/bets';
 import { hapticImpact, hapticNotify, hapticSelection } from '../telegram';
 import { useMainButton } from '../telegram/useMainButton';
@@ -190,10 +190,10 @@ export function BetsScreen({ onNavigate }: { onNavigate: (s: Screen) => void }) 
         <div className="text-4xl">👀</div>
         <h2 className="mt-2 font-display text-xl font-bold">Только просмотр</h2>
         <p className="mt-1 text-sm text-muted">
-          Твоего Telegram нет в списке восьми игроков, поэтому ставить нельзя — но следить за линией и
+          Твоего Telegram нет в списке игроков, поэтому ставить нельзя — но следить за линией и
           табло можно свободно.
         </p>
-        <div className="mt-3 tnum text-xs text-faint">поставили: {placed.length}/8</div>
+        <div className="mt-3 tnum text-xs text-faint">поставили: {placed.length}/{PLAYER_COUNT}</div>
       </div>
     );
   }
@@ -204,7 +204,7 @@ export function BetsScreen({ onNavigate }: { onNavigate: (s: Screen) => void }) 
   return (
     <div className="space-y-4 pb-4">
       <Callout tone="accent">
-        <b>Кэфы — множители очков, а не рублей.</b> Банк всегда ровно 800 ₽. Минимум {MIN_STAKE}, максимум{' '}
+        <b>Кэфы — множители очков, а не рублей.</b> Банк всегда ровно {BANK_RUB} ₽. Минимум {MIN_STAKE}, максимум{' '}
         {MAX_STAKE} очков на исход. Неиспользованные очки сгорают.
       </Callout>
 
@@ -286,7 +286,7 @@ export function BetsScreen({ onNavigate }: { onNavigate: (s: Screen) => void }) 
       </div>
 
       <p className="px-1 text-center text-xs text-faint">
-        {remote ? `Пока линия открыта, чужие ставки скрыты. Поставили: ${placed.length}/8.` : 'Пока линия открыта, чужие ставки скрыты.'}
+        {remote ? `Пока линия открыта, чужие ставки скрыты. Поставили: ${placed.length}/${PLAYER_COUNT}.` : 'Пока линия открыта, чужие ставки скрыты.'}
       </p>
 
       <div className="tnum mt-2 text-center text-xs text-faint">

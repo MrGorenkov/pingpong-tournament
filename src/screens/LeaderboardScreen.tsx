@@ -1,10 +1,42 @@
 import { useState } from 'react';
-import type { MatchView } from '../types';
+import type { MatchView, PlayerId, SetScore } from '../types';
 import { useTournament } from '../state/TournamentContext';
 import { PLAYERS_BY_ID } from '../data/participants';
+import { EXTRA_MATCHES } from '../data/extraMatches';
 import { matchStageLabel } from '../lib/labels';
 import { cx } from '../lib/ui';
 import { Monogram, PlaceBadge, SectionTitle } from '../components/primitives';
+
+function ScoreLine({ a, b, sets }: { a: PlayerId; b: PlayerId; sets: SetScore[] }) {
+  const setsA = sets.filter((s) => s.a > s.b).length;
+  const setsB = sets.filter((s) => s.b > s.a).length;
+  const wa = setsA > setsB;
+  const wb = setsB > setsA;
+  return (
+    <div>
+      <div className="flex items-center gap-2">
+        <span className={cx('flex-1 truncate text-right text-sm', wa ? 'font-bold' : 'text-muted')}>
+          {PLAYERS_BY_ID[a].name}
+        </span>
+        <span className="tnum w-10 text-center font-mono text-sm font-bold">
+          {setsA}:{setsB}
+        </span>
+        <span className={cx('flex-1 truncate text-sm', wb ? 'font-bold' : 'text-muted')}>
+          {PLAYERS_BY_ID[b].name}
+        </span>
+      </div>
+      {sets.length > 0 && (
+        <div className="tnum mt-1 flex flex-wrap justify-center gap-x-2 gap-y-0.5 font-mono text-[11px] text-faint">
+          {sets.map((s, i) => (
+            <span key={i}>
+              {s.a}:{s.b}
+            </span>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 function MatchLine({ m }: { m: MatchView }) {
   if (!m.a || !m.b) return null;
@@ -147,6 +179,17 @@ export function LeaderboardScreen() {
                   <div key={m.id} className="border-t border-hair/60 py-1 first:border-t-0">
                     <div className="pt-1 text-[10px] uppercase tracking-wide text-faint">{matchStageLabel(m)}</div>
                     <MatchLine m={m} />
+                  </div>
+                ))}
+              </div>
+            )}
+            {EXTRA_MATCHES.length > 0 && (
+              <div>
+                <div className="label-caps py-2">Доп. матчи</div>
+                {EXTRA_MATCHES.map((e, i) => (
+                  <div key={i} className="border-t border-hair/60 py-2 first:border-t-0">
+                    <div className="pb-1 text-[10px] uppercase tracking-wide text-faint">{e.label}</div>
+                    <ScoreLine a={e.a} b={e.b} sets={e.sets} />
                   </div>
                 ))}
               </div>

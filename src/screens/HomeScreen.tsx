@@ -1,13 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useTournament } from '../state/TournamentContext';
-import { BANK_RUB, PLAYER_COUNT } from '../data/rules';
 import { PLAYERS_BY_ID } from '../data/participants';
 import type { Screen } from '../lib/nav';
 import { matchStageLabel } from '../lib/labels';
 import { Callout, Monogram, SectionTitle } from '../components/primitives';
 import { MatchCard } from '../components/MatchCard';
 import { Confetti } from '../components/Confetti';
-import { fmtRub } from '../lib/ui';
 
 export function HomeScreen({
   onNavigate,
@@ -44,7 +42,7 @@ export function HomeScreen({
             </div>
             <div className="mt-1 text-sm text-muted">Красава, {PLAYERS_BY_ID[champ].name} 🏓🔥</div>
             <button className="btn-accent mt-4 w-full" onClick={() => onNavigate('board')}>
-              Смотреть итоги и выплаты
+              Смотреть итоги
             </button>
           </div>
         ) : (
@@ -58,7 +56,7 @@ export function HomeScreen({
               </div>
             </div>
             <button className="btn-accent mt-4 w-full" onClick={() => onNavigate('board')}>
-              Смотреть итоги и выплаты
+              Смотреть итоги
             </button>
           </div>
         )
@@ -96,23 +94,12 @@ export function HomeScreen({
         </section>
       )}
 
-      {/* bank */}
-      <section>
-        <SectionTitle>Тотализатор</SectionTitle>
-        <div className="card p-4">
-          <div className="flex items-baseline justify-between">
-            <span className="text-sm text-muted">Банк (фиксированный)</span>
-            <span className="tnum font-mono text-2xl font-extrabold text-accent">{fmtRub(BANK_RUB)}</span>
-          </div>
-          <p className="mt-2 text-xs leading-relaxed text-muted">
-            Кэфы — множители <b>очков</b>, а не рублей. Банк всегда ровно {BANK_RUB} ₽ ({PLAYER_COUNT}×100).
-            Результаты на столе тоже капают очки в этот же пул.
-          </p>
-          <button className="btn-ghost mt-3 w-full text-sm" onClick={() => onNavigate('board')}>
-            Итоги и распределение
-          </button>
-        </div>
-      </section>
+      {/* quick link to results */}
+      {champ && (
+        <button className="btn-ghost w-full" onClick={() => onNavigate('board')}>
+          Итоги и результаты матчей
+        </button>
+      )}
     </div>
   );
 }

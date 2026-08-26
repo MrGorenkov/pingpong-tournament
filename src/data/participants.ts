@@ -11,7 +11,7 @@ export const PLAYERS: Player[] = [
   { id: 'misha', name: 'Миша', seed: 3, group: 'B' },
   { id: 'timur', name: 'Тимур', seed: 4, group: 'A' },
   { id: 'galim', name: 'Галим', seed: 5, group: 'A' },
-  { id: 'isa', name: 'Иса', seed: 6, group: 'B' },
+  { id: 'isa', name: 'Миха', seed: 6, group: 'B' },
   { id: 'vanek', name: 'Ванёк', seed: 7, group: 'B' },
   { id: 'sanek', name: 'Санёк', seed: 8, group: 'A' },
 ];

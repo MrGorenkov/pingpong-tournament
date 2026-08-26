@@ -50,7 +50,8 @@ describe('resolveOutcome', () => {
     expect(R('final:tolyan', st)).toBe('won');
     expect(R('final:islam', st)).toBe('won');
     expect(R('final:misha', st)).toBe('lost');
-    expect(R('sp:final-3-0', st)).toBe('won');
+    // playoff is best-of-3, so a final never reaches 3 sets -> these specials can't win
+    expect(R('sp:final-3-0', st)).toBe('lost');
     expect(R('sp:final-3-1', st)).toBe('lost');
     expect(R('sp:final-tolyan-islam', st)).toBe('won');
   });

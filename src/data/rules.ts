@@ -18,7 +18,7 @@ export const VOID_ODDS = 1.0; // a match that didn't happen settles at 1.0
 // match format
 export const SET_POINT_TARGET = 11; // first to 11, win by 2
 export const GROUP_SETS_TO_WIN = 2; // best of 3
-export const PLAYOFF_SETS_TO_WIN = 3; // best of 5
+export const PLAYOFF_SETS_TO_WIN = 2; // best of 3 (играли до 2 побед)
 
 // bonus points credited into the same pool (instead of a cash prize fund)
 export const BONUS = {

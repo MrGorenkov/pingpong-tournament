@@ -1,9 +1,30 @@
 import { useState } from 'react';
+import type { MatchView } from '../types';
 import { useTournament } from '../state/TournamentContext';
 import { BANK_RUB, ENTRY_FEE_RUB, POOL_FEE_RUB, TABLE_FEE_RUB } from '../data/rules';
 import { PLAYERS_BY_ID } from '../data/participants';
+import { matchStageLabel } from '../lib/labels';
 import { cx, fmtPct, fmtPts, fmtRub } from '../lib/ui';
 import { Callout, Meter, Monogram, PlaceBadge, SectionTitle } from '../components/primitives';
+
+function MatchLine({ m }: { m: MatchView }) {
+  if (!m.a || !m.b) return null;
+  const wa = m.winner === m.a;
+  const wb = m.winner === m.b;
+  return (
+    <div className="flex items-center gap-2 py-1.5">
+      <span className={cx('flex-1 truncate text-right text-sm', wa ? 'font-bold' : 'text-muted')}>
+        {PLAYERS_BY_ID[m.a].name}
+      </span>
+      <span className="tnum w-12 text-center font-mono text-sm font-bold">
+        {m.status === 'void' ? '—' : `${m.setsA}:${m.setsB}`}
+      </span>
+      <span className={cx('flex-1 truncate text-sm', wb ? 'font-bold' : 'text-muted')}>
+        {PLAYERS_BY_ID[m.b].name}
+      </span>
+    </div>
+  );
+}
 
 export function LeaderboardScreen() {
   const { payout, view } = useTournament();
@@ -114,6 +135,51 @@ export function LeaderboardScreen() {
                 </div>
               ) : null,
             )}
+          </div>
+        </section>
+      )}
+
+      {/* match results — кто с кем играл */}
+      {view.allMatches.some((m) => m.status === 'complete' || m.status === 'void') && (
+        <section>
+          <SectionTitle>Результаты матчей</SectionTitle>
+          <div className="card px-3">
+            {(['A', 'B'] as const).map((g) => {
+              const ms = view.groupMatches.filter(
+                (m) => m.group === g && (m.status === 'complete' || m.status === 'void'),
+              );
+              if (ms.length === 0) return null;
+              return (
+                <div key={g}>
+                  <div className="label-caps py-2">Группа {g}</div>
+                  <div className="divide-y divide-hair/60">
+                    {ms.map((m) => (
+                      <MatchLine key={m.id} m={m} />
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+            {(() => {
+              const po = [
+                view.bracket.semifinals[0],
+                view.bracket.semifinals[1],
+                view.bracket.third,
+                view.bracket.final,
+              ].filter((m) => m.a && m.b && (m.status === 'complete' || m.status === 'void'));
+              if (po.length === 0) return null;
+              return (
+                <div>
+                  <div className="label-caps py-2">Плей-офф</div>
+                  {po.map((m) => (
+                    <div key={m.id} className="py-1">
+                      <div className="text-[10px] uppercase tracking-wide text-faint">{matchStageLabel(m)}</div>
+                      <MatchLine m={m} />
+                    </div>
+                  ))}
+                </div>
+              );
+            })()}
           </div>
         </section>
       )}

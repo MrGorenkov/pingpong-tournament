@@ -18,11 +18,14 @@ function Shell() {
   const [scoreMatchId, setScoreMatchId] = useState<string | null>(null);
 
   // When the line closes (locally or seen via sync), everyone gets the reveal.
+  // Gate on `loading` so the initial "open -> synced closed" jump on first load
+  // is NOT treated as a real transition (it would falsely open the reveal).
   const prevLine = useRef<string | null>(null);
   useEffect(() => {
+    if (loading) return;
     if (prevLine.current === 'open' && state.line === 'closed') setScreen('reveal');
     prevLine.current = state.line;
-  }, [state.line]);
+  }, [state.line, loading]);
 
   if (loading) {
     return (
